@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emoji Search / 絵文字検索ツール</title>
+<meta name="description" content="キーワードで絵文字を検索してコピー。あの絵文字どこだっけ、をすぐ解消。">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4214020669195548"
+     crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: #120f18; --card: #1d1826; --text: #f5f1fa; --sub: #a595c2;
+    --accent: #fbbf24; --accent2: #38d9c4; --border: #2e2640;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Segoe UI", Arial, sans-serif;
+    background: var(--bg); color: var(--text); padding: 16px;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .home-link { font-size: 22px; text-decoration: none; line-height: 1; }
+  .lang-btn { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  h1 { font-size: 21px; text-align: center; margin: 4px 0 4px; }
+  .lead { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  input[type="text"] {
+    width: 100%; padding: 12px; font-size: 15px; border: 1px solid var(--border);
+    border-radius: 10px; background: #150f1e; color: var(--text);
+  }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 14px; }
+  .emoji-cell {
+    background: #150f1e; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 28px; text-align: center; padding: 10px 0; cursor: pointer; position: relative;
+  }
+  .emoji-cell.copied::after {
+    content: attr(data-copied); position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: var(--accent); white-space: nowrap;
+  }
+  .no-results { text-align: center; color: var(--sub); font-size: 13px; margin-top: 20px; }
+  .footer-links { text-align: center; font-size: 12px; color: var(--sub); margin-top: 20px; line-height: 1.8; }
+  .footer-links a { color: var(--accent2); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row"><a href="https://naginata-work.github.io/" class="home-link" title="All tools">🧰</a><button class="lang-btn" id="langBtn">EN</button></div>
+  <h1 id="title">🔍 絵文字検索ツール</h1>
+  <p class="lead" id="lead">キーワードで絵文字を検索してタップでコピー。</p>
+
+  <div class="card">
+    <input type="text" id="searchInput" placeholder="">
+    <div class="grid" id="grid"></div>
+    <div class="no-results" id="noResults" style="display:none;"></div>
+  </div>
+
+  <p class="footer-links" id="footerLinks"></p>
+</div>
+
+<script>
+  const EMOJIS = [
+    ['😀','smile happy grin','笑顔 嬉しい'],['😂','laugh tears funny lol','笑う 爆笑'],['😍','love heart eyes crush','大好き ハート目'],
+    ['😭','cry sad tears','泣く 悲しい'],['😡','angry mad rage','怒る 激怒'],['😱','scared shock surprised','驚く 叫ぶ'],
+    ['😴','sleep tired sleepy','眠い 寝る'],['🤔','think hmm wonder','考える 疑問'],['😅','sweat nervous laugh','汗 苦笑い'],
+    ['🥳','party celebrate birthday','パーティー お祝い'],['😎','cool sunglasses','クール サングラス'],['🙄','eyeroll annoyed','呆れる'],
+    ['🥺','pleading puppy eyes please','お願い うるうる'],['😇','angel innocent halo','天使'],['🤗','hug welcome','ハグ 抱擁'],
+    ['👍','thumbs up good like yes','いいね 賛成'],['👎','thumbs down bad no','だめ 反対'],['👏','clap applause good job','拍手'],
+    ['🙏','pray thanks please hope','お願い 感謝'],['💪','strong muscle power','筋肉 力'],['👋','wave hello bye','手を振る バイバイ'],
+    ['✌️','peace victory','ピース 勝利'],['🤝','handshake deal agreement','握手 契約'],['👀','eyes look watch','目 見る'],
+    ['❤️','heart love red','ハート 愛'],['💔','heartbreak sad breakup','失恋 傷心'],['💯','hundred perfect score','満点 完璧'],
+    ['🔥','fire hot lit awesome','火 熱い やばい'],['✨','sparkle shine magic','キラキラ'],['⭐','star favorite','星'],
+    ['🎉','party confetti celebrate','おめでとう 祝う'],['🎂','cake birthday','ケーキ 誕生日'],['🎁','gift present','プレゼント'],
+    ['🍕','pizza food','ピザ'],['🍔','burger food','ハンバーガー'],['🍜','noodles ramen food','ラーメン 麺'],
+    ['🍣','sushi food japan','寿司'],['🍰','cake dessert sweet','ケーキ スイーツ'],['☕','coffee drink','コーヒー'],
+    ['🍺','beer drink alcohol','ビール'],['🍷','wine drink alcohol','ワイン'],['🍎','apple fruit','りんご'],
+    ['🍌','banana fruit','バナナ'],['🍇','grapes fruit','ぶどう'],['🐶','dog puppy animal','犬'],
+    ['🐱','cat kitten animal','猫'],['🐰','rabbit bunny animal','うさぎ'],['🐼','panda animal','パンダ'],
+    ['🦊','fox animal','キツネ'],['🐸','frog animal','カエル'],['🐧','penguin animal','ペンギン'],
+    ['🦁','lion animal','ライオン'],['🐘','elephant animal','象'],['🐢','turtle animal','亀'],
+    ['🌸','cherry blossom flower spring','桜 花'],['🌺','flower hibiscus','花'],['🌻','sunflower flower','ひまわり'],
+    ['🌈','rainbow','虹'],['☀️','sun sunny weather','太陽 晴れ'],['🌙','moon night','月'],
+    ['⛅','cloud weather partly sunny','雲 曇り'],['🌧️','rain weather','雨'],['❄️','snow winter cold','雪'],
+    ['⚡','lightning bolt energy','雷 稲妻'],['🌊','wave ocean sea','波 海'],['🏔️','mountain','山'],
+    ['🚀','rocket launch space','ロケット 宇宙'],['✈️','airplane travel flight','飛行機'],['🚗','car drive vehicle','車'],
+    ['🚲','bicycle bike','自転車'],['🚢','ship boat sea','船'],['🏠','house home','家'],
+    ['🏢','building office','ビル オフィス'],['🏖️','beach vacation summer','ビーチ 海辺'],['🗺️','map travel','地図'],
+    ['📱','phone mobile smartphone','スマホ 携帯'],['💻','laptop computer work','パソコン'],['⌚','watch time clock','時計'],
+    ['📷','camera photo','カメラ'],['🎮','game controller gaming','ゲーム'],['🎧','headphones music','ヘッドホン 音楽'],
+    ['🎵','music note song','音楽 音符'],['📚','books study read','本 勉強'],['✏️','pencil write','鉛筆'],
+    ['📝','memo note write','メモ'],['💡','idea lightbulb bright','アイデア 電球'],['🔑','key unlock','鍵'],
+    ['🔒','lock secure private','鍵 ロック'],['💰','money cash rich','お金'],['💵','dollar money cash','紙幣 お金'],
+    ['💳','credit card payment','カード 支払い'],['📈','chart growth increase up','グラフ 上昇'],['📉','chart decrease down loss','グラフ 下降'],
+    ['⏰','alarm clock time','目覚まし 時計'],['⏳','hourglass waiting time','砂時計'],['📅','calendar date schedule','カレンダー 予定'],
+    ['✅','check done complete yes','完了 チェック'],['❌','cross wrong no error','バツ 間違い'],['⚠️','warning caution alert','警告 注意'],
+    ['❓','question mark confused','疑問'],['❗','exclamation important','重要 感嘆符'],['🔔','bell notification alert','ベル 通知'],
+    ['🎯','target goal bullseye','的 目標'],['🏆','trophy winner champion','トロフィー 優勝'],['🥇','gold medal first place','金メダル'],
+    ['🎓','graduation cap education','卒業 帽子'],['💼','briefcase work business','ビジネス 仕事'],['🤝','partnership deal handshake','提携 握手'],
+    ['🧠','brain smart think','脳 頭脳'],['👑','crown king queen royal','王冠'],['🦋','butterfly insect','蝶'],
+    ['🌍','earth world globe','地球 世界'],['🎈','balloon party','風船'],['🎊','confetti party celebrate','紙吹雪 お祝い'],
+    ['🍀','clover luck lucky','四つ葉 幸運'],['🌟','star glowing shine','星 輝く'],['💤','sleep zzz tired','眠り'],
+    ['👶','baby infant','赤ちゃん'],['🧑‍💻','coder programmer developer','プログラマー'],['🧑‍🎨','artist creative','アーティスト']
+  ];
+
+  const I18N = {
+    ja: {
+      title: '🔍 絵文字検索ツール',
+      lead: 'キーワードで絵文字を検索してタップでコピー。',
+      placeholder: '例: 犬、笑顔、お金...',
+      noResults: '見つかりませんでした。別のキーワードを試してください。',
+      copied: 'コピー!',
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">文字数カウント</a>'
+    },
+    en: {
+      title: '🔍 Emoji Search',
+      lead: 'Search emoji by keyword and tap to copy.',
+      placeholder: 'e.g. dog, smile, money...',
+      noResults: 'No emoji found. Try a different keyword.',
+      copied: 'Copied!',
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">Text Counter</a>'
+    }
+  };
+
+  function loadLang() { try { return localStorage.getItem('emojiSearchLang'); } catch (e) { return null; } }
+  function saveLang(l) { try { localStorage.setItem('emojiSearchLang', l); } catch (e) {} }
+  let lang = loadLang() === 'en' ? 'en' : 'ja';
+  function t() { return I18N[lang]; }
+
+  function renderGrid(filter) {
+    const grid = document.getElementById('grid');
+    const q = filter.trim().toLowerCase();
+    const matches = EMOJIS.filter(([emoji, en, ja]) => {
+      if (!q) return true;
+      return en.toLowerCase().includes(q) || ja.includes(q);
+    });
+    grid.innerHTML = '';
+    document.getElementById('noResults').style.display = matches.length === 0 ? 'block' : 'none';
+    document.getElementById('noResults').textContent = t().noResults;
+    matches.slice(0, 60).forEach(([emoji]) => {
+      const cell = document.createElement('div');
+      cell.className = 'emoji-cell';
+      cell.textContent = emoji;
+      cell.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(emoji);
+          cell.classList.add('copied');
+          cell.setAttribute('data-copied', t().copied);
+          setTimeout(() => cell.classList.remove('copied'), 1000);
+        } catch { alert(emoji); }
+      });
+      grid.appendChild(cell);
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input', (e) => renderGrid(e.target.value));
+
+  function renderStaticText() {
+    document.getElementById('title').textContent = t().title;
+    document.getElementById('lead').textContent = t().lead;
+    document.getElementById('searchInput').placeholder = t().placeholder;
+    document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    renderGrid(document.getElementById('searchInput').value);
+  }
+
+  document.getElementById('langBtn').addEventListener('click', () => {
+    lang = lang === 'ja' ? 'en' : 'ja';
+    saveLang(lang);
+    document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+    renderStaticText();
+  });
+
+  document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+  renderStaticText();
+</script>
+</body>
+</html>
