@@ -54,7 +54,25 @@
     <div class="no-results" id="noResults" style="display:none;"></div>
   </div>
 
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="aboutTitle" style="font-size:15px; color:var(--text); margin:0 0 8px;"></h2>
+    <p id="aboutBody1" style="margin:0 0 10px;"></p>
+    <p id="aboutBody2" style="margin:0;"></p>
+  </div>
+
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="faqTitle" style="font-size:15px; color:var(--text); margin:0 0 10px;"></h2>
+    <p id="faq1Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq1A" style="margin:0 0 12px;"></p>
+    <p id="faq2Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq2A" style="margin:0;"></p>
+  </div>
+
   <p class="footer-links" id="footerLinks"></p>
+  <p style="text-align:center; font-size:11px; color:var(--sub); margin-top:4px;">
+    <a href="https://naginata-work.github.io/" style="color:var(--sub);" id="allToolsLink"></a> ・
+    <a href="https://naginata-work.github.io/privacy.html" style="color:var(--sub);" id="privacyLink"></a>
+  </p>
 </div>
 
 <script>
@@ -108,7 +126,15 @@
       placeholder: '例: 犬、笑顔、お金...',
       noResults: '見つかりませんでした。別のキーワードを試してください。',
       copied: 'コピー!',
-      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">文字数カウント</a>'
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">文字数カウント</a>',
+      aboutTitle: '使い方について',
+      aboutBody1: 'スマホの絵文字一覧はカテゴリごとに分かれていて、目当ての絵文字が見つかるまでスクロールし続けた経験がある方は多いと思います。「あの犬の絵文字、どこにあったっけ」というような、地味だけれど積み重なるとストレスになる場面です。',
+      aboutBody2: '「dog」「犬」のように、日本語でも英語でもキーワードを入力すると、該当する絵文字がその場で絞り込まれます。タップするだけでクリップボードにコピーされるので、そのままLINEやSNSの投稿に貼り付けられます。',
+      faqTitle: 'よくある質問',
+      faq1Q: '収録されている絵文字はどのくらいの種類?',
+      faq1A: '顔文字・動物・食べ物・天気・乗り物・仕事道具など、よく使われる約110種類を厳選して収録しています。',
+      faq2Q: '検索してもヒットしない絵文字がある場合は?',
+      faq2A: 'このツールは全絵文字を網羅しているわけではなく、日常でよく使われるものに絞ったリストです。見つからない場合は、スマホやパソコンの標準の絵文字キーボードもあわせてご利用ください。',
     },
     en: {
       title: '🔍 Emoji Search',
@@ -116,7 +142,15 @@
       placeholder: 'e.g. dog, smile, money...',
       noResults: 'No emoji found. Try a different keyword.',
       copied: 'Copied!',
-      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">Text Counter</a>'
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/text-tools/" target="_blank" rel="noopener">Text Counter</a>',
+      aboutTitle: 'How it works',
+      aboutBody1: "Your phone's emoji keyboard splits everything into categories, and scrolling through them to find one specific emoji is a small but very common annoyance — \"where was that dog emoji again?\"",
+      aboutBody2: "Type a keyword — in English or Japanese — and matching emoji filter instantly. Tap any of them to copy it straight to your clipboard, ready to paste into a message or post.",
+      faqTitle: 'FAQ',
+      faq1Q: 'How many emoji are included?',
+      faq1A: "About 110 commonly used ones, covering faces, animals, food, weather, vehicles, and everyday objects.",
+      faq2Q: "What if my search doesn't find anything?",
+      faq2A: "This isn't a complete emoji database — it's a curated list of frequently used ones. If something isn't here, your device's built-in emoji keyboard is a good fallback.",
     }
   };
 
@@ -158,6 +192,18 @@
     document.getElementById('lead').textContent = t().lead;
     document.getElementById('searchInput').placeholder = t().placeholder;
     document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    document.getElementById('aboutTitle').textContent = t().aboutTitle;
+    document.getElementById('aboutBody1').textContent = t().aboutBody1;
+    document.getElementById('aboutBody2').textContent = t().aboutBody2;
+    document.getElementById('faqTitle').textContent = t().faqTitle;
+    document.getElementById('faq1Q').textContent = t().faq1Q;
+    document.getElementById('faq1A').textContent = t().faq1A;
+    document.getElementById('faq2Q').textContent = t().faq2Q;
+    document.getElementById('faq2A').textContent = t().faq2A;
+    document.getElementById('allToolsLink').textContent = lang === 'ja' ? '他のツール一覧' : 'All tools';
+    document.getElementById('allToolsLink').href = 'https://naginata-work.github.io/';
+    document.getElementById('privacyLink').textContent = lang === 'ja' ? 'プライバシーポリシー' : 'Privacy policy';
+    document.getElementById('privacyLink').href = 'https://naginata-work.github.io/privacy.html';
     renderGrid(document.getElementById('searchInput').value);
   }
 
